@@ -1,0 +1,29 @@
+web1:
+  name: php-fusion
+  shared_writable_dirs:
+    - administration/db_backups/
+    - downloads/
+    - forum/attachments/
+    - ftp_upload/
+    - images/
+  php_extensions:
+    - mysql
+    - gd
+    - mbstring
+    - apc
+  after_build:
+    - "cp pagoda/config.php /var/www/config.php"
+  after_deploy:
+    - "mkdir -p downloads/images"
+    - "mkdir -p downloads/submissions"
+    - "cp pagoda/no_image.jpg downloads/images/no_image.jpg"
+    - "mkdir -p downloads/submissions/images"
+    - "cp -ra pagoda/images/* /var/www/images"
+
+db1:
+  name: php-fusion-db
+
+global:
+    env:
+        - APP_NAME: php-fusion
+        - COOKIE_PREFIX: fusion_
