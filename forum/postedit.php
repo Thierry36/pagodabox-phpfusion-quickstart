@@ -219,11 +219,11 @@ if (isset($_POST['savechanges'])) {
 				foreach ($_POST as $key=>$value){
 					if(!strstr($key, "delete_attach")) continue;
 					$key = str_replace("delete_attach_", "", $key);
-					$result = dbquery("SELECT * FROM ".DB_FORUM_ATTACHMENTS." WHERE post_id='".$_GET['post_id']."' and attach_id='$key'");
+					$result = dbquery("SELECT * FROM ".DB_FORUM_ATTACHMENTS." WHERE post_id='".$_GET['post_id']."' AND attach_id='".(isnum($key) ? $key : 0)."'");
 					if (dbrows($result) != 0 && $value) {
 						$adata = dbarray($result);
 						unlink(FORUM."attachments/".$adata['attach_name']);
-						$result = dbquery("DELETE FROM ".DB_FORUM_ATTACHMENTS." WHERE post_id='".$_GET['post_id']."' and attach_id='".$key."'");
+						$result = dbquery("DELETE FROM ".DB_FORUM_ATTACHMENTS." WHERE post_id='".$_GET['post_id']."' AND attach_id='".(isnum($key) ? $key : 0)."'");
 					}
 				}
 				if ($fdata['forum_attach'] && checkgroup($fdata['forum_attach'])) {

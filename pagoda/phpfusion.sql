@@ -721,7 +721,7 @@ INSERT INTO `pagoda_settings` (`settings_name`, `settings_value`) VALUES
 ('newsperpage',	'11'),
 ('flood_interval',	'15'),
 ('counter',	'1'),
-('version',	'7.02.05'),
+('version',	'7.02.06'),
 ('maintenance',	'0'),
 ('maintenance_message',	''),
 ('download_max_b',	'512000'),

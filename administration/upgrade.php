@@ -30,18 +30,13 @@ opentable($locale['400']);
 echo "<div style='text-align:center'><br />\n";
 echo "<form name='upgradeform' method='post' action='".FUSION_SELF.$aidlink."'>\n";
 
-if (str_replace(".", "", $settings['version']) < "70205") {
+if (str_replace(".", "", $settings['version']) < "70206") {
 	if (!isset($_POST['stage'])) {
 		echo sprintf($locale['500'], $locale['504'])."<br />\n".$locale['501']."<br /><br />\n";
 		echo "<input type='hidden' name='stage' value='2'>\n";
 		echo "<input type='submit' name='upgrade' value='".$locale['400']."' class='button'><br /><br />\n";
 	} elseif (isset($_POST['upgrade']) && isset($_POST['stage']) && $_POST['stage'] == 2) {
-		$check = dbcount("(settings_name)", DB_SETTINGS, "settings_name='smtp_auth'"); //new in v7.02.05
-		if (!$check) {
-			$result = dbquery("INSERT INTO ".DB_SETTINGS." (settings_name, settings_value) VALUES ('smtp_auth', '0')");
-		}
-		$result = dbquery("UPDATE ".DB_SETTINGS." SET settings_value='7.02.05' WHERE settings_name='version'");
-
+		$result = dbquery("UPDATE ".DB_SETTINGS." SET settings_value='7.02.06' WHERE settings_name='version'");
 		echo $locale['502']."<br /><br />\n";
 	}
 } else {

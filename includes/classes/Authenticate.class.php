@@ -38,7 +38,7 @@ class Authenticate {
 
 		$inputUserName = preg_replace(array("/\=/","/\#/","/\sOR\s/"), "", stripinput($inputUserName));
 
-		$result = dbquery("	SELECT * FROM ".DB_USERS." WHERE user_name='".$inputUserName."' LIMIT 1");
+		$result = dbquery("SELECT * FROM ".DB_USERS." WHERE user_name='".$inputUserName."' LIMIT 1");
 
 		if (dbrows($result) == 1) {
 		    $user = dbarray($result);
@@ -46,23 +46,22 @@ class Authenticate {
 			require_once CLASSES."PasswordAuth.class.php";
 
 			// Initialize password auth
-			$passAuth 								= new PasswordAuth();
-			$passAuth->currentAlgo 					= $user["user_algo"];
-			$passAuth->currentSalt 					= $user["user_salt"];
-			$passAuth->currentPasswordHash 			= $user["user_password"];
-			$passAuth->inputPassword 				= $inputPassword;
+			$passAuth = new PasswordAuth();
+			$passAuth->currentAlgo = $user["user_algo"];
+			$passAuth->currentSalt = $user["user_salt"];
+			$passAuth->currentPasswordHash = $user["user_password"];
+			$passAuth->inputPassword = $inputPassword;
 
 			// Check if input password is valid
 			if ($passAuth->isValidCurrentPassword(true)) {
 				if ($settings['multiple_logins'] != 1) {
-					$user['user_algo'] 					= $passAuth->getNewAlgo();
-					$user['user_salt'] 					= $passAuth->getNewSalt();
-					$user['user_password'] 				= $passAuth->getNewHash();
+					$user['user_algo'] = $passAuth->getNewAlgo();
+					$user['user_salt'] = $passAuth->getNewSalt();
+					$user['user_password'] = $passAuth->getNewHash();
 
 					$result = dbquery(
 						"UPDATE ".DB_USERS."
-						SET user_algo='".$user['user_algo']."', user_salt='".$user['user_salt']."',
-							user_password='".$user['user_password']."'
+						SET user_algo='".$user['user_algo']."', user_salt='".$user['user_salt']."', user_password='".$user['user_password']."'
 						WHERE user_id='".$user['user_id']."'"
 					);
 				}
@@ -114,9 +113,9 @@ class Authenticate {
 		$cookiePath = COOKIE_PATH; $cookieName = COOKIE_USER;
 
 		if ($remember) {
-		    $cookieExpiration = time() + 1209600; // 14 days
+			$cookieExpiration = time() + 1209600; // 14 days
 		} else {
-		    $cookieExpiration = time() + 172800; // 48 hours
+			$cookieExpiration = time() + 172800; // 48 hours
 		}
 
 		if (!$userCookie) {
@@ -126,7 +125,7 @@ class Authenticate {
 		}
 
 		$key = hash_hmac($algo, $userID.$cookieExpiration, $salt);
-		$hash = hash_hmac($algo, $userID.$cookieExpiration, $key );
+		$hash = hash_hmac($algo, $userID.$cookieExpiration, $key);
 
 		$cookieContent = $userID.".".$cookieExpiration.".".$hash;
 
@@ -152,7 +151,7 @@ class Authenticate {
 				if ($cookieExpiration > time()) {
 					$result = dbquery(
 						"SELECT * FROM ".DB_USERS."
-						WHERE user_id='".$userID."' AND user_status='0' AND user_actiontime='0'
+						WHERE user_id='".(isnum($userID) ? $userID : 0)."' AND user_status='0' AND user_actiontime='0'
 						LIMIT 1"
 					);
 					if (dbrows($result) == 1) {
@@ -199,7 +198,7 @@ class Authenticate {
 					if ($cookieExpiration > time()) {
 						$result = dbquery(
 							"SELECT user_admin_algo, user_admin_salt FROM ".DB_USERS."
-							WHERE user_id='".$userID."' AND user_level>101 AND  user_status='0' AND user_actiontime='0'
+							WHERE user_id='".(isnum($userID) ? $userID : 0)."' AND user_level>101 AND  user_status='0' AND user_actiontime='0'
 							LIMIT 1"
 						);
 						if (dbrows($result) == 1) {
@@ -214,10 +213,10 @@ class Authenticate {
 				}
 			} elseif ($pass != "") {
 				$result = dbquery(
-							"SELECT user_admin_algo, user_admin_salt, user_admin_password FROM ".DB_USERS."
-							WHERE user_id='".$userdata['user_id']."' AND user_level>101 AND  user_status='0' AND user_actiontime='0'
-							LIMIT 1"
-						);
+					"SELECT user_admin_algo, user_admin_salt, user_admin_password FROM ".DB_USERS."
+					WHERE user_id='".$userdata['user_id']."' AND user_level>101 AND  user_status='0' AND user_actiontime='0'
+					LIMIT 1"
+				);
 				if (dbrows($result)  == 1) {
 					$user = dbarray($result);
 					if ($user['user_admin_algo'] != "md5") {
@@ -254,14 +253,14 @@ class Authenticate {
 			if ($cookie_exists) {
 				if ($_COOKIE[COOKIE_LASTVISIT] > $userdata['user_lastvisit']) {
 					$update_threads = true;
-					$lastvisit      = $userdata['user_lastvisit'];
+					$lastvisit = $userdata['user_lastvisit'];
 				} else {
 					$set_cookie = false;
-					$lastvisit  = $_COOKIE[COOKIE_LASTVISIT];
+					$lastvisit = $_COOKIE[COOKIE_LASTVISIT];
 				}
 			} else {
 				$update_threads = true;
-				$lastvisit      = $userdata['user_lastvisit'];
+				$lastvisit = $userdata['user_lastvisit'];
 			}         
 			if ($update_threads) { dbquery("UPDATE ".DB_USERS." SET user_threads='' WHERE user_id='".$userdata['user_id']."'"); }
 		} else {
@@ -290,22 +289,21 @@ class Authenticate {
 			require_once CLASSES."PasswordAuth.class.php";
 
 			// Initialize password auth
-			$passAuth 								= new PasswordAuth();
-			$passAuth->currentAlgo 					= $userdata['user_admin_algo'];
-			$passAuth->currentSalt 					= $userdata['user_admin_salt'];
-			$passAuth->currentPasswordHash 			= $userdata['user_admin_password'];
-			$passAuth->inputPassword 				= $inputPassword;
+			$passAuth = new PasswordAuth();
+			$passAuth->currentAlgo = $userdata['user_admin_algo'];
+			$passAuth->currentSalt = $userdata['user_admin_salt'];
+			$passAuth->currentPasswordHash = $userdata['user_admin_password'];
+			$passAuth->inputPassword = $inputPassword;
 
 			// Check if input password is valid
 			if ($passAuth->isValidCurrentPassword(true)) {
-				$userdata['user_admin_algo']		= $passAuth->getNewAlgo();
-				$userdata['user_admin_salt'] 		= $passAuth->getNewSalt();
-				$userdata['user_admin_password'] 	= $passAuth->getNewHash();
+				$userdata['user_admin_algo'] = $passAuth->getNewAlgo();
+				$userdata['user_admin_salt'] = $passAuth->getNewSalt();
+				$userdata['user_admin_password'] = $passAuth->getNewHash();
 
 				$result = dbquery(
 					"UPDATE ".DB_USERS."
-					SET user_admin_algo='".$userdata['user_admin_algo']."', user_admin_salt='".$userdata['user_admin_salt']."',
-						user_admin_password='".$userdata['user_admin_password']."'
+					SET user_admin_algo='".$userdata['user_admin_algo']."', user_admin_salt='".$userdata['user_admin_salt']."', user_admin_password='".$userdata['user_admin_password']."'
 					WHERE user_id='".$userdata['user_id']."'"
 				);
 
